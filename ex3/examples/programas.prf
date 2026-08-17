@@ -1,0 +1,73 @@
+# Primitivas auxiliares
+# ZN é a função constante zero com N argumentos.
+
+# Constantes
+ZERO = Z1
+ZERO0 = Z0
+ONE0 = COMP(S, [Z0])
+ONE = COMP(S, [Z1])
+TWO = COMP(S, [ONE])
+
+# Funções básicas
+PRED = REC(Z0, P1_2)
+ISZERO = REC(ONE0, Z2)
+ADD = REC(P1_1, COMP(S, [P3_3]))
+SUB = REC(P1_1, COMP(PRED, [P3_3]))
+MUL = REC(Z1, COMP(ADD, [P1_3, P3_3]))
+NOT = ISZERO
+AND = MUL
+
+# Comparação e seleção: IFZERO(a, b, c) retorna a se c=0;
+# caso contrário, retorna b.
+LEQ = COMP(ISZERO, [SUB])
+SWAP_LEQ = COMP(LEQ, [P2_2, P1_2])
+EQ = COMP(AND, [LEQ, SWAP_LEQ])
+IFZERO = REC(P1_2, P2_4)
+
+# Divisão inteira. DIV_RAW(b, n) percorre n e incrementa o quociente
+# quando o próximo múltiplo de b ainda cabe em n.
+INC_ACC = COMP(S, [P3_3])
+NEXT_BOUND = COMP(S, [P2_3])
+PRODUCT = COMP(MUL, [INC_ACC, P1_3])
+BOUND_OK = COMP(LEQ, [PRODUCT, NEXT_BOUND])
+NEXT_Q = COMP(IFZERO, [P3_3, INC_ACC, BOUND_OK])
+DIV_RAW = REC(Z1, NEXT_Q)
+RAW_DIV = COMP(DIV_RAW, [P2_2, P1_2])
+DIV = COMP(IFZERO, [Z2, RAW_DIV, P2_2])
+
+# Resto inteiro, com MOD(n, 0)=0.
+DIV_VALUE = COMP(DIV, [P1_2, P2_2])
+QUOTIENT_TIMES_B = COMP(MUL, [DIV_VALUE, P2_2])
+MOD_RAW = COMP(SUB, [P1_2, QUOTIENT_TIMES_B])
+MOD = COMP(IFZERO, [Z2, MOD_RAW, P2_2])
+
+# Primalidade: procura divisores de 2 até n-1 usando uma recursão
+# limitada pelo argumento n-2.
+TWO_Y = COMP(S, [COMP(S, [P2_3])])
+CANDIDATE_REMAINDER = COMP(MOD, [P1_3, TWO_Y])
+DIVISIBLE = COMP(ISZERO, [CANDIDATE_REMAINDER])
+NOT_PREVIOUS = COMP(NOT, [P3_3])
+NOT_DIVISIBLE = COMP(NOT, [DIVISIBLE])
+BOTH_FALSE = COMP(AND, [NOT_PREVIOUS, NOT_DIVISIBLE])
+OR_RESULT = COMP(NOT, [BOTH_FALSE])
+ANY_DIVISOR = REC(Z1, OR_RESULT)
+
+N_LE_ONE = COMP(LEQ, [P1_1, ONE])
+GT_ONE = COMP(NOT, [N_LE_ONE])
+N_MINUS_TWO = COMP(SUB, [P1_1, TWO])
+HAS_DIVISOR = COMP(ANY_DIVISOR, [P1_1, N_MINUS_TWO])
+NO_DIVISOR = COMP(ISZERO, [HAS_DIVISOR])
+PRIME = COMP(AND, [GT_ONE, NO_DIVISOR])
+
+# Fibonacci. PAIR, FST e SND são auxiliares da biblioteca do interpretador
+# baseados no emparelhamento de Cantor; o estado é (F(n), F(n+1)).
+PAIR_ZERO_ONE = COMP(PAIR, [Z0, ONE0])
+FIB_STEP = COMP(
+    PAIR,
+    [
+        COMP(SND, [P2_2]),
+        COMP(ADD, [COMP(FST, [P2_2]), COMP(SND, [P2_2])]),
+    ]
+)
+FIB_STATE = REC(PAIR_ZERO_ONE, FIB_STEP)
+FIB = COMP(FST, [FIB_STATE])
