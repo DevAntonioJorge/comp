@@ -218,9 +218,9 @@ def rodar_versao_b(x, y):
 # Ponto de entrada
 # =============================================================================
 
-if __name__ == "__main__":
-    x = int(input("Digite o primeiro número (x): "))
-    y = int(input("Digite o segundo número (y): "))
+''' if __name__ == "__main__":
+        x = int(input("Digite o primeiro número (x): "))
+        y = int(input("Digite o segundo número (y): "))
 
     rodar_versao_a(x, y)
 
@@ -231,4 +231,4 @@ if __name__ == "__main__":
     except TimeoutError as e:
         print(f"\n[ERRO CONTROLADO - Versão B] {e}")
     except ValueError as e:
-        print(f"\n[ERRO - Versão B] {e}")
+        print(f"\n[ERRO - Versão B] {e}")'''
